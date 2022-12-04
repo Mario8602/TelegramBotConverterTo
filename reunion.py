@@ -46,7 +46,7 @@ def pdf_to_image(file_path='test.pdf'):
 
     output_folder = r'jpeg_files/'
     file_name = Path(file_path).stem
-    images = convert_from_path(fr'jpeg_files\{file_name}.pdf',
+    images = convert_from_path(fr'received_file\{file_name}.pdf',
                                poppler_path=r'M:\poppler-22.04.0\Library\bin',
                                output_folder=output_folder, fmt='jpeg',
                                output_file=f'{file_name}')
@@ -78,6 +78,7 @@ def pdf_to_word(file_path='test.pdf', docx_file='test.docx'):
 
 
 def filesFolder(file_path1=r"mp_files"):
+    """ Количество файлов в определённой папке """
     for root, dirs, files in os.walk(file_path1):
         return len(files)
 
@@ -120,6 +121,65 @@ def photo_noir_convert(file_path='test.jpg', file_name='test1.jpeg'):
 # if __name__ == "__main__":
 #     main()
 
+def resize_image(file_name='test.jpeg', resize_x=0, resize_y=0):
+    resize_in_persent = 50
+    resize_x = resize_x
+    resize_y = resize_y
+
+    directory = 'received_file\\'
+    if resize_y or resize_x != 0:
+        resize_in_persent = False
+
+    sent_img = Image.open(fr'received_file\\{file_name}')
+    (width, height) = sent_img.size
+    print(width, height)
+    width_size = height_size = 0
+
+    if resize_in_persent:
+        percent = 100 / resize_in_persent
+        width_size = int(float(sent_img.size[0]) / percent)
+        height_size = int(float(sent_img.size[1]) / percent)
+        print('lol')
+    else:
+        if resize_x:
+            delta = resize_x / float(sent_img.size[0])
+            width_size = int(float(sent_img.size[0]) * delta)
+            height_size = int(float(sent_img.size[1]) * delta)
+            print('noe')
+        else:
+            delta = resize_y / float(sent_img.size[1])
+            width_size = int(float(sent_img.size[0]) * delta)
+            height_size = int(float(sent_img.size[1]) * delta)
+            print('Law')
+    sent_img = sent_img.resize((width_size, height_size))
+
+    sent_img.save('M:\\PythonProjects\\tg_bot_convert\\received_file\\ola3.jpeg')
+
+
+# def square_image(file_name, crop_width=200, crop_height=200):
+#     """ Обрезает изображение по квадрату от центра """
+#     image_op = Image.open(fr'received_file/{file_name}')
+#     img_width, img_height = image_op.size
+#
+#     image_op.crop(((img_width - crop_width) // 2,
+#                     (img_height - crop_height) // 2,
+#                     (img_width + crop_width) // 2,
+#                     (img_height + crop_height) // 2))
+#     image_op.save(fr'square_photo\\{file_name}', quality=95)
+
+
+def square_image(file_name='test.jpeg') -> Image:
+    """
+    Функция для обрезки изображения по центру.
+    """
+    image = Image.open(fr'received_file\{file_name}')
+    img_width, img_height = image.size
+    image = image.crop(((img_width - min(image.size)) // 2,
+                   (img_height - min(image.size)) // 2,
+                   (img_width + min(image.size)) // 2,
+                   (img_height + min(image.size)) // 2))
+    image.save(f'square_photo\\{file_name}', quality=95)
+
 
 def photo_oua():
     pass
@@ -145,5 +205,3 @@ def check_number(number=11):
     return [f'Yes, {number} is simple number' if len([i for i in range(1, number + 1) if number % i == 0]) == 2 else 'Not s1mple']\
 
 
-def compress():
-    pass

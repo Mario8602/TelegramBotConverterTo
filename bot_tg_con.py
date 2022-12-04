@@ -3,7 +3,8 @@ from random import randint
 import telebot
 from telebot import types
 
-from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, delete_file, create_folder
+from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, delete_file, create_folder, \
+    resize_image, square_image
 import os
 
 bot = telebot.TeleBot("5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE", parse_mode=None)
@@ -50,8 +51,8 @@ def converter(message):
     markup_inline = types.InlineKeyboardMarkup(row_width=1)
 
     btn1 = types.InlineKeyboardButton(text='blackout', callback_data=f'blackout,name={file_namee}.jpeg')
-    btn2 = types.InlineKeyboardButton(text='compress', callback_data=f'compress,name={file_namee}.jpeg')
-    btn3 = types.InlineKeyboardButton(text='2jpeg', callback_data=f'2jpeg,name={file_namee}.jpeg')
+    btn2 = types.InlineKeyboardButton(text='square', callback_data=f'square,name={file_namee}.jpeg')
+    btn3 = types.InlineKeyboardButton(text='resize', callback_data=f'resize,name={file_namee}.jpeg')
 
     markup_inline.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, 'Выберите процедуру', reply_markup=markup_inline)
@@ -73,7 +74,6 @@ def callback(call):
                 file = open(fr'mp_files\{file_name[:-4]}.mp3', 'rb')
 
                 bot.send_document(call.message.chat.id, file)
-                bot.send_message(call.message.chat.id, 'GOOD')
                 file.close()
 
             elif method == '2jpeg':
@@ -88,7 +88,6 @@ def callback(call):
                         file = open(fr'jpeg_files\{file_name[:-4]}0001-{page + 1}.jpg', 'rb')
                         bot.send_document(call.message.chat.id, file)
                         file.close()
-                bot.send_message(call.message.chat.id, 'оно?')
 
             elif method == '2word':
                 create_folder(file_name='docx_files')
@@ -104,12 +103,18 @@ def callback(call):
                 file = open(fr"bw_photo\{file_name}", 'rb')
                 bot.send_document(call.message.chat.id, file)
 
-            elif method == 'compress':
-                create_folder(file_name='compress_files')
-                # create_folder(file_name='bw_photo')
-                # photo_noir_convert(file_path=fr"received_file/{file_name}", file_name=file_name)
-                # file = open(fr"bw_photo\{file_name}", 'rb')
-                # bot.send_document(call.message.chat.id, file)
+            elif method == 'square':
+                create_folder(file_name='square_photo')
+                square_image(file_name)
+                file = open(fr'square_photo\\{file_name}', 'rb')
+                bot.send_document(call.message.chat.id, file)
+
+
+            elif method == 'resize':
+                create_folder(file_name='resize_photo')
+                file_name = file_name
+                # resize_image(file_path=fr'received_file\{file_name}')
+
 
             else:
                 bot.send_message(call.message.chat.id, 'oh, no, pls')
@@ -143,4 +148,5 @@ def answer(message):
         bot.send_message(message.chat.id, 'Мне бы твой файл ;)')
 
 
-bot.infinity_polling()
+# bot.infinity_polling()
+bot.polling(none_stop=True, interval=0)
