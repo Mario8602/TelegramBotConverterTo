@@ -6,7 +6,7 @@ from telebot import types
 from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, delete_file, create_folder, \
     resize_image, square_image
 
-bot = telebot.TeleBot("5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE", parse_mode=None)
+bot = telebot.TeleBot("TOKEN", parse_mode=None)
 
 @bot.message_handler(commands=['start'])
 def start(message):
