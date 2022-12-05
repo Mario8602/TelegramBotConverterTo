@@ -5,13 +5,12 @@ from telebot import types
 
 from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, delete_file, create_folder, \
     resize_image, square_image
-import os
 
 bot = telebot.TeleBot("5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE", parse_mode=None)
 
-
 @bot.message_handler(commands=['start'])
 def start(message):
+    delete_file()
     name = f'Hello, {message.from_user.first_name} {message.from_user.last_name}\nОтправьте свой файл: '
     bot.send_message(message.chat.id, name, parse_mode='html')
 
@@ -20,6 +19,7 @@ def start(message):
 @bot.message_handler(content_types=['document'])
 def converter(message):
     # сохранение полученного файла и определение типа
+    delete_file()
     file_info = bot.get_file(message.document.file_id)
     print(file_info)
     create_folder(file_name='received_file')
@@ -40,6 +40,7 @@ def converter(message):
 
 @bot.message_handler(content_types=['photo'])
 def converter(message):
+    delete_file()
     file_info = bot.get_file(message.photo[-1].file_id)
     file_downloaded = bot.download_file(file_info.file_path)
     file_namee = str(randint(1, 1000))
@@ -68,7 +69,7 @@ def callback(call):
 
             if method == '2mp3':
 
-                bot.send_message(call.message.chat.id, 'Я В ПРОЦЕССЕ..., жди')
+                bot.send_message(call.message.chat.id, 'Обрабатываю...подождите пожалуйста')
                 create_folder(file_name='mp_files')
                 pdf_to_mp3(file_path=r"received_file/" + file_name, language='ru')
                 file = open(fr'mp_files\{file_name[:-4]}.mp3', 'rb')
@@ -102,27 +103,28 @@ def callback(call):
                 photo_noir_convert(file_path=fr"received_file/{file_name}", file_name=file_name)
                 file = open(fr"bw_photo\{file_name}", 'rb')
                 bot.send_document(call.message.chat.id, file)
+                file.close()
 
             elif method == 'square':
                 create_folder(file_name='square_photo')
                 square_image(file_name)
                 file = open(fr'square_photo\\{file_name}', 'rb')
                 bot.send_document(call.message.chat.id, file)
-
+                file.close()
 
             elif method == 'resize':
                 create_folder(file_name='resize_photo')
-                file_name = file_name
-                # resize_image(file_path=fr'received_file\{file_name}')
-
+                resize_image(file_name)
+                file = open(f'resize_photo\\{file_name}', 'rb')
+                bot.send_document(call.message.chat.id, file)
+                file.close()
 
             else:
                 bot.send_message(call.message.chat.id, 'oh, no, pls')
 
-            # delete_file()
 
     except Exception as ex:
-        bot.send_message(call.message.chat.id, 'Я поломаться')
+        bot.send_message(call.message.chat.id, 'Error, что то пошло не так...')
         print(ex)
 
 

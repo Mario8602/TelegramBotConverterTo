@@ -43,7 +43,7 @@ def pdf_to_mp3(file_path='test.pdf', language='ru'):
 
 
 def pdf_to_image(file_path='test.pdf'):
-
+    """ Конвертирует PDF-файл в фотографии, постранично"""
     output_folder = r'jpeg_files/'
     file_name = Path(file_path).stem
     images = convert_from_path(fr'received_file\{file_name}.pdf',
@@ -86,7 +86,7 @@ def filesFolder(file_path1=r"mp_files"):
 def delete_file():
     """Очистка файлов из списка папок"""
     try:
-        for i in ['received_file', 'mp_files', 'docx_files', 'jpeg_files', 'bw_photo', '']:
+        for i in ['received_file', 'mp_files', 'docx_files', 'jpeg_files', 'bw_photo', 'resize_photo', 'square_photo']:
             for root, dirs, files in os.walk(fr"{i}"):
                 for filename in files:
                     os.remove(fr'{i}\{filename}')
@@ -122,11 +122,11 @@ def photo_noir_convert(file_path='test.jpg', file_name='test1.jpeg'):
 #     main()
 
 def resize_image(file_name='test.jpeg', resize_x=0, resize_y=0):
+    """ Изменение размера изображение в 2 раза """
     resize_in_persent = 50
     resize_x = resize_x
     resize_y = resize_y
 
-    directory = 'received_file\\'
     if resize_y or resize_x != 0:
         resize_in_persent = False
 
@@ -139,39 +139,21 @@ def resize_image(file_name='test.jpeg', resize_x=0, resize_y=0):
         percent = 100 / resize_in_persent
         width_size = int(float(sent_img.size[0]) / percent)
         height_size = int(float(sent_img.size[1]) / percent)
-        print('lol')
     else:
         if resize_x:
             delta = resize_x / float(sent_img.size[0])
             width_size = int(float(sent_img.size[0]) * delta)
             height_size = int(float(sent_img.size[1]) * delta)
-            print('noe')
         else:
             delta = resize_y / float(sent_img.size[1])
             width_size = int(float(sent_img.size[0]) * delta)
             height_size = int(float(sent_img.size[1]) * delta)
-            print('Law')
     sent_img = sent_img.resize((width_size, height_size))
-
-    sent_img.save('M:\\PythonProjects\\tg_bot_convert\\received_file\\ola3.jpeg')
-
-
-# def square_image(file_name, crop_width=200, crop_height=200):
-#     """ Обрезает изображение по квадрату от центра """
-#     image_op = Image.open(fr'received_file/{file_name}')
-#     img_width, img_height = image_op.size
-#
-#     image_op.crop(((img_width - crop_width) // 2,
-#                     (img_height - crop_height) // 2,
-#                     (img_width + crop_width) // 2,
-#                     (img_height + crop_height) // 2))
-#     image_op.save(fr'square_photo\\{file_name}', quality=95)
+    sent_img.save(f'resize_photo\\{file_name}')
 
 
 def square_image(file_name='test.jpeg') -> Image:
-    """
-    Функция для обрезки изображения по центру.
-    """
+    """Функция для обрезки изображения по центру"""
     image = Image.open(fr'received_file\{file_name}')
     img_width, img_height = image.size
     image = image.crop(((img_width - min(image.size)) // 2,
@@ -179,10 +161,6 @@ def square_image(file_name='test.jpeg') -> Image:
                    (img_width + min(image.size)) // 2,
                    (img_height + min(image.size)) // 2))
     image.save(f'square_photo\\{file_name}', quality=95)
-
-
-def photo_oua():
-    pass
 
 
 def mourin(n):
