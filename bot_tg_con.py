@@ -3,10 +3,11 @@ from random import randint
 import telebot
 from telebot import types
 
-from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, delete_file, create_folder, \
-    resize_image, square_image
+from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, \
+    delete_file, create_folder, resize_image, square_image
 
-bot = telebot.TeleBot("TOKEN", parse_mode=None)
+bot = telebot.TeleBot(r'5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE', parse_mode=None)
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -15,7 +16,7 @@ def start(message):
     bot.send_message(message.chat.id, name, parse_mode='html')
 
 
-# получение файла и дальнейшие пути обработки
+# получение файла ботом и дальнейшие пути обработки
 @bot.message_handler(content_types=['document'])
 def converter(message):
     # сохранение полученного файла и определение типа
@@ -23,7 +24,7 @@ def converter(message):
     file_info = bot.get_file(message.document.file_id)
     print(file_info)
     create_folder(file_name='received_file')
-    src = r"received_file/" + message.document.file_name
+    src = r'received_file/' + message.document.file_name
     file_download = bot.download_file(file_info.file_path)
     with open(src, 'wb') as new_file:
         new_file.write(file_download)
@@ -45,7 +46,7 @@ def converter(message):
     file_downloaded = bot.download_file(file_info.file_path)
     file_namee = str(randint(1, 1000))
     create_folder(file_name='received_file')
-    src = fr"received_file\{file_namee}.jpeg"
+    src = fr'received_file\{file_namee}.jpeg'
     with open(src, 'wb') as new_file:
         new_file.write(file_downloaded)
 
@@ -71,7 +72,7 @@ def callback(call):
 
                 bot.send_message(call.message.chat.id, 'Обрабатываю...подождите пожалуйста')
                 create_folder(file_name='mp_files')
-                pdf_to_mp3(file_path=r"received_file/" + file_name, language='ru')
+                pdf_to_mp3(file_path=r'received_file/' + file_name, language='ru')
                 file = open(fr'mp_files\{file_name[:-4]}.mp3', 'rb')
 
                 bot.send_document(call.message.chat.id, file)
@@ -79,7 +80,7 @@ def callback(call):
 
             elif method == '2jpeg':
                 create_folder(file_name='jpeg_files')
-                pdf_to_image(file_path=r"received_file/" + file_name)
+                pdf_to_image(file_path=r'received_file/' + file_name)
                 if filesFolder(r'jpeg_files') == 1:
                     file = open(fr'jpeg_files\{file_name[:-4]}0001-1.jpg', 'rb')
                     bot.send_document(call.message.chat.id, file)
@@ -92,7 +93,7 @@ def callback(call):
 
             elif method == '2word':
                 create_folder(file_name='docx_files')
-                pdf_to_word(file_path=r"received_file/" + file_name,
+                pdf_to_word(file_path=r'received_file/' + file_name,
                             docx_file=fr'docx_files\{file_name[:-4]}.docx')
                 file = open(fr'docx_files\{file_name[:-4]}.docx', 'rb')
                 bot.send_document(call.message.chat.id, file)
@@ -100,8 +101,8 @@ def callback(call):
 
             elif method == 'blackout':
                 create_folder(file_name='bw_photo')
-                photo_noir_convert(file_path=fr"received_file/{file_name}", file_name=file_name)
-                file = open(fr"bw_photo\{file_name}", 'rb')
+                photo_noir_convert(file_path=fr'received_file/{file_name}', file_name=file_name)
+                file = open(fr'bw_photo\{file_name}', 'rb')
                 bot.send_document(call.message.chat.id, file)
                 file.close()
 
@@ -122,11 +123,9 @@ def callback(call):
             else:
                 bot.send_message(call.message.chat.id, 'oh, no, pls')
 
-
     except Exception as ex:
         bot.send_message(call.message.chat.id, 'Error, что то пошло не так...')
         print(ex)
-
 
 # try:
 #     for i in ['mp_files', 'docx_files', 'pdf_files', 'pdftojpeg']:
@@ -150,5 +149,4 @@ def answer(message):
         bot.send_message(message.chat.id, 'Мне бы твой файл ;)')
 
 
-# bot.infinity_polling()
-bot.polling(none_stop=True, interval=0)
+bot.infinity_polling()
