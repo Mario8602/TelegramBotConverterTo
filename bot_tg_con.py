@@ -3,7 +3,7 @@ from random import randint
 import telebot
 from telebot import types
 
-from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesFolder, \
+from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesfolder, \
     delete_file, create_folder, resize_image, square_image
 
 bot = telebot.TeleBot(r'5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE', parse_mode=None)
@@ -62,7 +62,7 @@ def converter(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
-    """ В зависимости от выбранной кнопки, возвращает данные и вызывает необходимую функцию для обработки файла"""
+    """ В зависимости от выбранного действия, возвращает данные и вызывает необходимую функцию для обработки файла """
     try:
         if call.message:
             method = call.data.split(',name=')[0]
@@ -81,12 +81,12 @@ def callback(call):
             elif method == '2jpeg':
                 create_folder(file_name='jpeg_files')
                 pdf_to_image(file_path=r'received_file/' + file_name)
-                if filesFolder(r'jpeg_files') == 1:
+                if filesfolder(r'jpeg_files') == 1:
                     file = open(fr'jpeg_files\{file_name[:-4]}0001-1.jpg', 'rb')
                     bot.send_document(call.message.chat.id, file)
                     file.close()
                 else:
-                    for page in range(filesFolder(r'jpeg_files')):
+                    for page in range(filesfolder(r'jpeg_files')):
                         file = open(fr'jpeg_files\{file_name[:-4]}0001-{page + 1}.jpg', 'rb')
                         bot.send_document(call.message.chat.id, file)
                         file.close()
