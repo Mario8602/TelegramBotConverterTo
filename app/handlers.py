@@ -1,11 +1,10 @@
-from gtts import gTTS
-import pdfplumber
 import os.path
-from pathlib import Path
-
 import numpy as np
-from PIL import Image
 
+import pdfplumber
+from gtts import gTTS
+from pathlib import Path
+from PIL import Image
 from pdf2image import convert_from_path
 from pdf2docx import Converter
 
@@ -14,7 +13,8 @@ def pdf_to_mp3(file_path='test.pdf', language='ru'):
     """ Конвертировать PDF-файл в mp3-файл"""
     if os.path.exists(file_path) and Path(file_path).suffix == '.pdf':
 
-        # открытие файла с использованием pdfplumber для получения подробных сведений о каждом текстовом символе
+        # открытие файла с использованием pdfplumber для
+        # получения подробных сведений о каждом текстовом символе
         # extract - собирает все символьные объекты страницы в одну строку
 
         with pdfplumber.PDF(open(file=file_path, mode='rb')) as pdf:
@@ -32,33 +32,15 @@ def pdf_to_mp3(file_path='test.pdf', language='ru'):
         return FileNotFoundError
 
 
-# def main():
-#     file_path = input("\nУкажите путь до файла: ")
-#     language = input("\nУкажите язык: ")
-#     print(pdf_to_mp3(file_path=file_path, language=language))
-#
-#
-# if __name__ == "__main__":
-#     main()
-
-
-def pdf_to_image(file_path='test.pdf'):
+def pdf_to_image(file_path='test.pdf', directory='received_file'):
     """ Конвертирует PDF-файл в фотографии, постранично """
     output_folder = r'jpeg_files/'
     file_name = Path(file_path).stem
-    images = convert_from_path(fr'received_file\{file_name}.pdf',
-                               poppler_path=r'M:\poppler-22.04.0\Library\bin',
+    images = convert_from_path(f'{directory}/{file_name}.pdf',
+                               poppler_path=r'/usr/bin/',
                                output_folder=output_folder, fmt='jpeg',
                                output_file=f'{file_name}')
     return f'[+] {file_name}.jpg saved success!'
-
-
-# def main():
-#     print(pdf_to_image(r'M:\PythonProjects\neiron\pdf_files\Reao.pdf'))
-#
-#
-# if __name__ == "__main__":
-#     main()
 
 
 def pdf_to_word(file_path='test.pdf', docx_file='test.docx'):
@@ -67,14 +49,6 @@ def pdf_to_word(file_path='test.pdf', docx_file='test.docx'):
     file.convert(docx_file)
     file.close()
     return file
-
-
-# def main():
-#     print(pdf_to_word(r'M:\PythonProjects\neiron\pdf_files\Reao.pdf'))
-#
-#
-# if __name__ == "__main__":
-#     main()
 
 
 def filesfolder(file_path1=r'mp_files'):
@@ -86,7 +60,8 @@ def filesfolder(file_path1=r'mp_files'):
 def delete_file():
     """Очистка файлов из списка папок"""
     try:
-        for i in ['received_file', 'mp_files', 'docx_files', 'jpeg_files', 'bw_photo', 'resize_photo', 'square_photo']:
+        for i in ['received_file', 'mp_files', 'docx_files',
+                  'jpeg_files', 'bw_photo', 'resize_photo', 'square_photo']:
             for root, dirs, files in os.walk(fr'{i}'):
                 for filename in files:
                     os.remove(fr'{i}\{filename}')
@@ -95,7 +70,8 @@ def delete_file():
 
 
 def create_folder(file_name='testfile'):
-    """Создание папки в директории, для файлов полученных тг-ботом, если папки не существует"""
+    """Создание папки в директории, для файлов \
+        полученных тг-ботом, если папки не существует"""
     try:
         new_path = Path(file_name)
         if Path.is_dir(new_path):
@@ -113,13 +89,6 @@ def photo_noir_convert(file_path='test.jpg', file_name='test1.jpeg'):
     k = np.repeat(sums, 3).reshape(a.shape)
     Image.fromarray(k).save(fr'bw_photo\{file_name}')
 
-
-# def main():
-#     print(photo_noir_convert(file_path=r"M:\PythonProjects\tg_bot_convert\received_file\9d0ecc90b315444a927f50b6eeaa91e6.jpeg"))
-#
-#
-# if __name__ == "__main__":
-#     main()
 
 def resize_image(file_name='test.jpeg', resize_x=0, resize_y=0):
     """ Изменение размера изображение в 2 раза """
@@ -160,24 +129,3 @@ def square_image(file_name='test.jpeg') -> Image:
                         (img_width + min(image.size)) // 2,
                         (img_height + min(image.size)) // 2))
     image.save(f'square_photo\\{file_name}', quality=95)
-
-
-def mourin(n):
-    """ Список простых чисел до n """
-    c = 0
-    result = []
-    for i in range(1, n + 1):
-        a = 0
-        for j in range(1, i + 1):
-            if i % j == 0:
-                a += 1
-                c = j
-            if a == 2:
-                if c not in result:
-                    result.append(c)
-    return result
-
-
-def check_number(number=11):
-    return [f'Yes, {number} is simple number' if len(
-        [i for i in range(1, number + 1) if number % i == 0]) == 2 else 'not simple']

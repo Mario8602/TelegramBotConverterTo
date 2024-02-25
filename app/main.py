@@ -1,25 +1,32 @@
+import os
 from random import randint
 
 import telebot
 from telebot import types
+from dotenv import load_dotenv
 
-from reunion import pdf_to_mp3, photo_noir_convert, pdf_to_image, pdf_to_word, filesfolder, \
-    delete_file, create_folder, resize_image, square_image
+from handlers import (pdf_to_mp3, photo_noir_convert,
+                      pdf_to_image, pdf_to_word,
+                      filesfolder, delete_file,
+                      create_folder, resize_image,
+                      square_image)
 
-bot = telebot.TeleBot(r'5780381393:AAHsbrC8uV8mib125ZucgCs6WxtNbZWPavE', parse_mode=None)
+
+load_dotenv()
+
+bot = telebot.TeleBot(os.getenv('TG_BOT_API'), parse_mode=None)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
     delete_file()
-    name = f'Hello, {message.from_user.first_name} {message.from_user.last_name}\nОтправьте свой файл: '
+    name = f'Здравствуйте, {message.from_user.first_name} {message.from_user.last_name}\nОтправьте свой файл: '
     bot.send_message(message.chat.id, name, parse_mode='html')
 
 
 # получение файла ботом и дальнейшие пути обработки
 @bot.message_handler(content_types=['document'])
 def converter(message):
-    # сохранение полученного файла и определение типа
     delete_file()
     file_info = bot.get_file(message.document.file_id)
     print(file_info)
@@ -31,16 +38,19 @@ def converter(message):
 
     markup_inline = types.InlineKeyboardMarkup(row_width=1)
 
-    btn1 = types.InlineKeyboardButton(text='2mp3', callback_data=f'2mp3,name={message.document.file_name}')
-    btn2 = types.InlineKeyboardButton(text='2word', callback_data=f'2word,name={message.document.file_name}')
-    btn3 = types.InlineKeyboardButton(text='2jpeg', callback_data=f'2jpeg,name={message.document.file_name}')
+    btn1 = types.InlineKeyboardButton(text='2mp3',
+                                      callback_data=f'2mp3,name={message.document.file_name}')
+    btn2 = types.InlineKeyboardButton(text='2word',
+                                      callback_data=f'2word,name={message.document.file_name}')
+    btn3 = types.InlineKeyboardButton(text='2jpeg',
+                                      callback_data=f'2jpeg,name={message.document.file_name}')
 
     markup_inline.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, 'Выберите процедуру', reply_markup=markup_inline)
 
 
 @bot.message_handler(content_types=['photo'])
-def converter(message):
+def converter_ph(message):
     delete_file()
     file_info = bot.get_file(message.photo[-1].file_id)
     file_downloaded = bot.download_file(file_info.file_path)
@@ -52,9 +62,12 @@ def converter(message):
 
     markup_inline = types.InlineKeyboardMarkup(row_width=1)
 
-    btn1 = types.InlineKeyboardButton(text='blackout', callback_data=f'blackout,name={file_namee}.jpeg')
-    btn2 = types.InlineKeyboardButton(text='square', callback_data=f'square,name={file_namee}.jpeg')
-    btn3 = types.InlineKeyboardButton(text='resize', callback_data=f'resize,name={file_namee}.jpeg')
+    btn1 = types.InlineKeyboardButton(text='blackout',
+                                      callback_data=f'blackout,name={file_namee}.jpeg')
+    btn2 = types.InlineKeyboardButton(text='square',
+                                      callback_data=f'square,name={file_namee}.jpeg')
+    btn3 = types.InlineKeyboardButton(text='resize',
+                                      callback_data=f'resize,name={file_namee}.jpeg')
 
     markup_inline.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, 'Выберите процедуру', reply_markup=markup_inline)
@@ -62,7 +75,8 @@ def converter(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
-    """ В зависимости от выбранного действия, возвращает данные и вызывает необходимую функцию для обработки файла """
+    """ В зависимости от выбранного действия, возвращает данные \
+        и вызывает необходимую функцию для обработки файла """
     try:
         if call.message:
             method = call.data.split(',name=')[0]
@@ -70,7 +84,7 @@ def callback(call):
 
             if method == '2mp3':
 
-                bot.send_message(call.message.chat.id, 'Обрабатываю...подождите пожалуйста')
+                bot.send_message(call.message.chat.id, 'Обрабатываю...пожалуйста подождите ')
                 create_folder(file_name='mp_files')
                 pdf_to_mp3(file_path=r'received_file/' + file_name, language='ru')
                 file = open(fr'mp_files\{file_name[:-4]}.mp3', 'rb')
@@ -126,14 +140,6 @@ def callback(call):
     except Exception as ex:
         bot.send_message(call.message.chat.id, 'Error, что то пошло не так...')
         print(ex)
-
-# try:
-#     for i in ['mp_files', 'docx_files', 'pdf_files', 'pdftojpeg']:
-#         for root, dirs, files in os.walk(fr"M:\PythonProjects\neiron\{i}"):
-#             for filename in files:
-#                 os.remove(fr'M:\PythonProjects\neiron\{i}\{filename}')
-# except Exception as ex:
-#     print(ex)
 
 
 @bot.message_handler(content_types=['text'])
